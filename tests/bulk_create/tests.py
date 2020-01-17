@@ -8,9 +8,10 @@ from django.test import (
 )
 
 from .models import (
-    Country, NoFields, NullableFields, Pizzeria, ProxyCountry,
-    ProxyMultiCountry, ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant,
-    State, TwoFields,
+    Country, NoFields, NullableFields, NullableFieldsForeign,
+    NullableFieldsForeignAutoKey, NullableFieldsForeignUUIDKey,
+    NullableFieldsForeignBigAutoKey, Pizzeria, ProxyCountry, ProxyMultiCountry,
+    ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant, State, TwoFields,
 )
 
 
@@ -235,6 +236,18 @@ class BulkCreateTests(TestCase):
             with self.subTest(field=field):
                 field_value = '' if isinstance(field, FileField) else None
                 self.assertEqual(NullableFields.objects.filter(**{field.name: field_value}).count(), 1)
+
+    @skipUnlessDBFeature('has_bulk_insert')
+    def test_bulk_insert_nullable_foreign_fields(self):
+        NullableFieldsForeign.objects.bulk_create([
+            NullableFieldsForeign(foreign_key_auto=NullableFieldsForeignAutoKey.objects.create()),
+            NullableFieldsForeign(foreign_key_big_auto=NullableFieldsForeignBigAutoKey.objects.create()),
+            NullableFieldsForeign(foreign_key_uuid=NullableFieldsForeignUUIDKey.objects.create()),
+        ])
+        self.assertEqual(NullableFieldsForeign.objects.count(), 3)
+        self.assertEqual(NullableFieldsForeign.objects.exclude(foreign_key_auto=None).count(), 1)
+        self.assertEqual(NullableFieldsForeign.objects.exclude(foreign_key_big_auto=None).count(), 1)
+        self.assertEqual(NullableFieldsForeign.objects.exclude(foreign_key_uuid=None).count(), 1)
 
     @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
     def test_set_pk_and_insert_single_item(self):
