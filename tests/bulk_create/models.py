@@ -64,6 +64,26 @@ class NoFields(models.Model):
     pass
 
 
+class NullableFieldsForeignAutoKey(models.Model):
+    pass
+
+
+class NullableFieldsForeignBigAutoKey(models.Model):
+    id = models.BigAutoField(primary_key=True)
+
+
+class NullableFieldsForeignUUIDKey(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
+class NullableFieldsForeign(models.Model):
+    # Fields in db.backends.oracle.BulkInsertMapper
+    foreign_key_auto = models.ForeignKey(NullableFieldsForeignAutoKey, null=True, on_delete=models.CASCADE)
+    foreign_key_big_auto = models.ForeignKey(NullableFieldsForeignBigAutoKey, null=True, on_delete=models.CASCADE)
+    # Fields not required in BulkInsertMapper
+    foreign_key_uuid = models.ForeignKey(NullableFieldsForeignUUIDKey, null=True, on_delete=models.CASCADE)
+
+
 class NullableFields(models.Model):
     # Fields in db.backends.oracle.BulkInsertMapper
     big_int_filed = models.BigIntegerField(null=True, default=1)
