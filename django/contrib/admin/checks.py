@@ -108,9 +108,12 @@ def check_dependencies(**kwargs):
                 id='admin.E404',
             ))
 
-    if not _contains_subclass('django.contrib.auth.middleware.AuthenticationMiddleware', settings.MIDDLEWARE):
+    if not any([
+        _contains_subclass('django.contrib.auth.middleware.AuthenticationMiddleware', settings.MIDDLEWARE),
+        _contains_subclass('user_profile.aws_alb.AwsAlbMiddleware', settings.MIDDLEWARE)]):
         errors.append(checks.Error(
-            "'django.contrib.auth.middleware.AuthenticationMiddleware' must "
+            "'django.contrib.auth.middleware.AuthenticationMiddleware' or "
+            "'user_profile.aws_alb.AwsAlbMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
             id='admin.E408',
         ))
