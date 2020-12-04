@@ -110,11 +110,11 @@ def check_dependencies(**kwargs):
 
     if not any([
         _contains_subclass('django.contrib.auth.middleware.AuthenticationMiddleware', settings.MIDDLEWARE),
-        _contains_subclass('user_profile.aws_alb.AwsAlbMiddleware', settings.MIDDLEWARE)]):
-        errors.append(checks.Error(
-            "'django.contrib.auth.middleware.AuthenticationMiddleware' or "
-            "'user_profile.aws_alb.AwsAlbMiddleware' must "
-            "be in MIDDLEWARE in order to use the admin application.",
+        warnings.append(checks.Warning(
+            "'django.contrib.auth.middleware.AuthenticationMiddleware' is not "
+            "in MIDDLEWARE in order to use the admin application.  The admin application requires "
+            "some form of authentication to function properly.  Please ensure that you are using "
+            "another middleware that attaches an authenticated user to the request object.",
             id='admin.E408',
         ))
     if not _contains_subclass('django.contrib.messages.middleware.MessageMiddleware', settings.MIDDLEWARE):
