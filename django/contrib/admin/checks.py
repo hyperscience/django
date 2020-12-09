@@ -108,11 +108,10 @@ def check_dependencies(**kwargs):
                 id='admin.E404',
             ))
 
-    if not any([
-        _contains_subclass('django.contrib.auth.middleware.AuthenticationMiddleware', settings.MIDDLEWARE),
-        warnings.append(checks.Warning(
+    if not _contains_subclass('django.contrib.auth.middleware.AuthenticationMiddleware', settings.MIDDLEWARE):
+        errors.append(checks.Warning(
             "'django.contrib.auth.middleware.AuthenticationMiddleware' is not "
-            "in MIDDLEWARE in order to use the admin application.  The admin application requires "
+            "in MIDDLEWARE  The admin application requires "
             "some form of authentication to function properly.  Please ensure that you are using "
             "another middleware that attaches an authenticated user to the request object.",
             id='admin.E408',
