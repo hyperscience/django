@@ -55,6 +55,7 @@ DEFAULT_NAMES = (
     "default_manager_name",
     "indexes",
     "constraints",
+    "randomize_auto_pk",
 )
 
 
