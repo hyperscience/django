@@ -31,7 +31,9 @@ DEFAULT_NAMES = (
     'auto_created', 'index_together', 'apps', 'default_permissions',
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
-    'indexes', 'constraints', 'randomize_auto_pk',
+    'indexes', 'constraints', 'randomize_auto_pk', 'nonclustered',
+    # `randomized_auto_pk` and `nonclustered` are MSSQL backend specific.
+    # `randomized_auto_pk` implies `nonclustered`.
 )
 
 
