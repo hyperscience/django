@@ -56,6 +56,9 @@ DEFAULT_NAMES = (
     "indexes",
     "constraints",
     "randomize_auto_pk",
+    "nonclustered",
+    # `randomized_auto_pk` and `nonclustered` are MSSQL backend specific.
+    # `randomized_auto_pk` implies `nonclustered`.
 )
 
 
