@@ -8,6 +8,7 @@ circular import difficulties.
 import copy
 import functools
 import inspect
+import logging
 import warnings
 from collections import namedtuple
 
@@ -20,6 +21,8 @@ from django.utils.deprecation import RemovedInDjango40Warning
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
 PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct filtered_relation')
+
+logger = logging.getLogger('django.db.backends')
 
 
 class InvalidQueryType(type):
@@ -141,6 +144,11 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
+                logger.error(
+                    'Trying to fetch deferred field {} for model {}. Use select_related if this is a FK otherwise '
+                    'include it in only() or remove from defer ()',
+                    field_name, str(instance.__class__)
+                )
                 instance.refresh_from_db(fields=[field_name])
             else:
                 data[field_name] = val
