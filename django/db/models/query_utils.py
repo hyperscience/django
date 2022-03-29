@@ -145,7 +145,7 @@ class DeferredAttribute:
             val = self._check_parent_chain(instance)
             if val is None:
                 logger.error(
-                    'Trying to fetch deferred field {} for model {}. Use select_related if this is a FK otherwise '
+                    'Trying to fetch deferred field %s for model %s. Use select_related if this is a FK otherwise '
                     'include it in only() or remove from defer ()',
                     field_name, str(instance.__class__)
                 )
