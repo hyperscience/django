@@ -23,6 +23,7 @@ from django.utils.deprecation import RemovedInDjango40Warning
 PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct filtered_relation')
 
 logger = logging.getLogger('django.db.backends')
+hs_logger = logging.getLogger('hs.django.logger')
 
 
 class InvalidQueryType(type):
@@ -144,7 +145,7 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
-                logger.error(
+                hs_logger.error(
                     'Trying to fetch deferred field %s for model %s. Use select_related if this is a FK otherwise '
                     'include it in only() or remove from defer ()',
                     field_name, str(instance.__class__)
