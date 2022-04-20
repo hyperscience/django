@@ -8,6 +8,7 @@ circular import difficulties.
 import functools
 import inspect
 import logging
+import warnings
 from collections import namedtuple
 
 from django.core.exceptions import FieldError
@@ -16,6 +17,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
 logger = logging.getLogger("django.db.models")
+hs_logger = logging.getLogger('hs.django.logger')
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -179,6 +181,11 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
+                hs_logger.error(
+                    'Trying to fetch deferred field %s for model %s. Use select_related if this is a FK otherwise '
+                    'include it in only() or remove from defer ()',
+                    field_name, str(instance.__class__)
+                )
                 instance.refresh_from_db(fields=[field_name])
             else:
                 data[field_name] = val
