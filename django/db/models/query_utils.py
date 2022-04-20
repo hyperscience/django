@@ -9,6 +9,7 @@ circular import difficulties.
 import functools
 import inspect
 import logging
+import warnings
 from collections import namedtuple
 from contextlib import nullcontext
 
@@ -20,6 +21,7 @@ from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 logger = logging.getLogger("django.db.models")
+hs_logger = logging.getLogger('hs.django.logger')
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -267,6 +269,11 @@ class DeferredAttribute:
                     raise AttributeError(
                         "Cannot read a generated field from an unsaved model."
                     )
+                hs_logger.error(
+                    'Trying to fetch deferred field %s for model %s. Use select_related if this is a FK otherwise '
+                    'include it in only() or remove from defer ()',
+                    field_name, str(instance.__class__)
+                )
                 instance.refresh_from_db(fields=[field_name])
             else:
                 data[field_name] = val
