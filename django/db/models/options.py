@@ -2,6 +2,7 @@ import bisect
 import copy
 from collections import defaultdict
 
+from django.apps.registry import apps as global_apps
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
@@ -252,13 +253,25 @@ class Options:
         return new_objs
 
     def _get_default_pk_class(self):
+        app_config = self.app_config
+        if app_config is None and self.app_label:
+            try:
+                app_config = global_apps.get_app_config(self.app_label)
+            except LookupError:
+                pass
+
         pk_class_path = getattr(
+<<<<<<< HEAD
             self.app_config,
             "default_auto_field",
+=======
+            app_config,
+            'default_auto_field',
+>>>>>>> 82d898d72c (RER-760: default_auto_field ignored for m2m)
             settings.DEFAULT_AUTO_FIELD,
         )
-        if self.app_config and self.app_config._is_default_auto_field_overridden:
-            app_config_class = type(self.app_config)
+        if app_config and app_config._is_default_auto_field_overridden:
+            app_config_class = type(app_config)
             source = (
                 f"{app_config_class.__module__}."
                 f"{app_config_class.__qualname__}.default_auto_field"
