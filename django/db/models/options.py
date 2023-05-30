@@ -265,13 +265,8 @@ class Options:
                 pass
 
         pk_class_path = getattr(
-<<<<<<< HEAD
-            self.app_config,
-            "default_auto_field",
-=======
             app_config,
-            'default_auto_field',
->>>>>>> 82d898d72c (RER-760: default_auto_field ignored for m2m)
+            "default_auto_field",
             settings.DEFAULT_AUTO_FIELD,
         )
         if app_config and app_config._is_default_auto_field_overridden:
