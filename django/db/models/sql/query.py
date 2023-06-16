@@ -465,7 +465,9 @@ class Query(BaseExpression):
                         self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                     )
                 inner_query.default_cols = False
-                if not qualify:
+                # Disable for now, see:
+                # https://hyperscience.atlassian.net/browse/CORE-2756
+                if False:
                     # Mask existing annotations that are not referenced by
                     # aggregates to be pushed to the outer query unless
                     # filtering against window functions is involved as it
