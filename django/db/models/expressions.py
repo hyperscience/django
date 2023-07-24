@@ -1180,8 +1180,17 @@ class Ref(Expression):
     def get_refs(self):
         return {self.refs}
 
-    def relabeled_clone(self, relabels):
-        return self
+    def relabeled_clone(self, change_map):
+        # Unlike `resolve_expression`, `relabeled_clone` *returns* a
+        # new object. Thus, although `source` gets resolved correctly to the
+        # aliased table name, the correctly resolved name is not changed
+        # in-place. So we also need to resolve it here.
+        # In fact, it's quite possible the comment above for
+        # `resolve_expression` is incorrect, and `resolve_expression` is also
+        # a change that doesn't mutate the original object, and so must be
+        # done as well by `Ref` instead of having it as a no-op. Currently,
+        # we haven't ran into an issue yet so we'll leave that alone for now.
+        return super().relabeled_clone(change_map)
 
     def as_sql(self, compiler, connection):
         return connection.ops.quote_name(self.refs), []
