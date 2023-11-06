@@ -455,6 +455,10 @@ class Collector:
             # send pre_delete signals
             for model, obj in self.instances_with_model():
                 if not model._meta.auto_created:
+                    # CORE-3229: Forward signals from proxy models to their concrete
+                    # models
+                    if model._meta.proxy:
+                        model = model._meta.concrete_model
                     signals.pre_delete.send(
                         sender=model,
                         instance=obj,
@@ -503,6 +507,10 @@ class Collector:
                     deleted_counter[model._meta.label] += count
 
                 if not model._meta.auto_created:
+                    # CORE-3229: Forward signals from proxy models to their concrete
+                    # models
+                    if model._meta.proxy:
+                        model = model._meta.concrete_model
                     for obj in instances:
                         signals.post_delete.send(
                             sender=model,
