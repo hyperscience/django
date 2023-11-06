@@ -464,14 +464,17 @@ class ModelState:
 class Model(AltersData, metaclass=ModelBase):
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
-        cls = self.__class__
+        cls = sender = self.__class__
         opts = self._meta
         _setattr = setattr
         _DEFERRED = DEFERRED
         if opts.abstract:
             raise TypeError("Abstract models cannot be instantiated.")
 
-        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+        # CORE-3229: Forward signals from proxy models to their concrete models
+        if sender._meta.proxy:
+            sender = sender._meta.concrete_model
+        pre_init.send(sender=sender, args=args, kwargs=kwargs)
 
         # Set up the storage for instance state
         self._state = ModelState()
@@ -574,7 +577,7 @@ class Model(AltersData, metaclass=ModelBase):
                     f"{unexpected_names}"
                 )
         super().__init__()
-        post_init.send(sender=cls, instance=self)
+        post_init.send(sender=sender, instance=self)
 
     @classmethod
     def from_db(cls, db, field_names, values):
@@ -982,14 +985,14 @@ class Model(AltersData, metaclass=ModelBase):
         using = using or router.db_for_write(self.__class__, instance=self)
         assert not (force_insert and (force_update or update_fields))
         assert update_fields is None or update_fields
-        cls = origin = self.__class__
-        # Skip proxies, but keep the origin as the proxy model.
+        cls = self.__class__
+        # CORE-3229: Forward signals from proxy models to their concrete models
         if cls._meta.proxy:
             cls = cls._meta.concrete_model
         meta = cls._meta
         if not meta.auto_created:
             pre_save.send(
-                sender=origin,
+                sender=cls,
                 instance=self,
                 raw=raw,
                 using=using,
@@ -1024,7 +1027,7 @@ class Model(AltersData, metaclass=ModelBase):
         # Signal that the save is complete
         if not meta.auto_created:
             post_save.send(
-                sender=origin,
+                sender=cls,
                 instance=self,
                 created=(not updated),
                 update_fields=update_fields,
